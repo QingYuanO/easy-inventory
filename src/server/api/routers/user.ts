@@ -1,16 +1,9 @@
-import { z } from "zod";
 
-import {
-  createTRPCRouter,
-  protectedProcedure,
-  publicProcedure,
-} from "@/server/api/trpc";
+import { UpdateUserSchema } from "@/lib/schema/UpdateUserSchema";
+import { createTRPCRouter, protectedProcedure } from "@/server/api/trpc";
 import { shops, users, usersToShops } from "@/server/db/schema";
-import { phoneRegex } from "@/lib/regExp";
 import { TRPCError } from "@trpc/server";
-import { NextResponse } from "next/server";
 import { and, eq } from "drizzle-orm";
-import { revalidatePath } from "next/cache";
 
 export const userRouter = createTRPCRouter({
   getUsersByShop: protectedProcedure.query(async ({ ctx }) => {
@@ -24,7 +17,12 @@ export const userRouter = createTRPCRouter({
       });
     }
     const userList = await db
-      .select({ name: users.name, phone: users.phone, id: users.id })
+      .select({
+        name: users.name,
+        phone: users.phone,
+        id: users.id,
+        account: users.account,
+      })
       .from(usersToShops)
       .leftJoin(users, eq(usersToShops.userId, users.id))
       .leftJoin(shops, eq(usersToShops.shopId, shops.id))
@@ -32,12 +30,7 @@ export const userRouter = createTRPCRouter({
     return userList;
   }),
   create: protectedProcedure
-    .input(
-      z.object({
-        name: z.string().min(1),
-        phone: z.string().regex(phoneRegex, "请输入正确的手机号!"),
-      }),
-    )
+    .input(UpdateUserSchema)
     .mutation(async ({ ctx, input }) => {
       const { session, db } = ctx;
       const { user } = session;
@@ -51,7 +44,7 @@ export const userRouter = createTRPCRouter({
       const userRes = await db
         .select({ id: users.id })
         .from(users)
-        .where(eq(users.phone, input.phone));
+        .where(eq(users.account, input.account));
       const userExist = userRes[0];
 
       if (userExist) {
@@ -79,6 +72,7 @@ export const userRouter = createTRPCRouter({
           .values({
             name: input.name,
             phone: input.phone,
+            account: input.account,
           })
           .returning();
         const newUser = res[0];

@@ -1,14 +1,10 @@
 "use client";
-import React from "react";
 
-import { useForm } from "react-hook-form";
-import { useRouter } from "next/navigation";
-import { zodResolver } from "@hookform/resolvers/zod";
-import * as z from "zod";
 import { Button } from "@/components/ui/button";
 import {
   Form,
   FormControl,
+  FormDescription,
   FormField,
   FormItem,
   FormLabel,
@@ -16,25 +12,25 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/components/ui/use-toast";
-import { phoneRegex } from "@/lib/regExp";
-import { useSession } from "next-auth/react";
+import { UpdateUserSchema } from "@/lib/schema/UpdateUserSchema";
 import { api } from "@/trpc/react";
-import { revalidatePath } from "next/cache";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useRouter } from "next/navigation";
+import { useForm } from "react-hook-form";
+import * as z from "zod";
 
-const InviteUserFormSchema = z.object({
-  phone: z.string().regex(phoneRegex, "请输入正确的手机号!"),
-  name: z.string().min(1, "用户名不能为空"),
-});
+
 
 export default function InviteUserForm() {
   const router = useRouter();
+  const utils = api.useUtils()
   const { mutate, isLoading } = api.user.create.useMutation({
     onSuccess() {
       toast({
         description: "创建成功",
         variant: "default",
       });
-      
+      router.refresh()
       setTimeout(() => {
         router.back();
       }, 500);
@@ -46,19 +42,21 @@ export default function InviteUserForm() {
       });
     },
   });
-  const form = useForm<z.infer<typeof InviteUserFormSchema>>({
-    resolver: zodResolver(InviteUserFormSchema),
+  const form = useForm<z.infer<typeof UpdateUserSchema>>({
+    resolver: zodResolver(UpdateUserSchema),
     defaultValues: {
       phone: "",
       name: "",
+      account: "",
     },
   });
   const { toast } = useToast();
-  const onSubmit = async (values: z.infer<typeof InviteUserFormSchema>) => {
+  const onSubmit = async (values: z.infer<typeof UpdateUserSchema>) => {
     console.log(values);
     mutate({
       name: values.name,
       phone: values.phone,
+      account: values.account,
     });
   };
   return (
@@ -66,6 +64,20 @@ export default function InviteUserForm() {
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="w-full">
           <div className="space-y-2">
+          <FormField
+              control={form.control}
+              name="account"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>账号</FormLabel>
+                  <FormControl>
+                    <Input placeholder="请输入账号" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                  <FormDescription>建议姓+电话号码的组合</FormDescription>
+                </FormItem>
+              )}
+            />
             <FormField
               control={form.control}
               name="phone"
@@ -84,9 +96,9 @@ export default function InviteUserForm() {
               name="name"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>用户名</FormLabel>
+                  <FormLabel>姓名</FormLabel>
                   <FormControl>
-                    <Input placeholder="请输入用户名" type="text" {...field} />
+                    <Input placeholder="请输入姓名" type="text" {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>

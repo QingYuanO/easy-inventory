@@ -1,4 +1,8 @@
+import { db } from "@/server/db";
+import { createTable, shops, users } from "@/server/db/schema";
 import { DrizzleAdapter } from "@auth/drizzle-adapter";
+import { compareSync } from "bcryptjs";
+import { eq } from "drizzle-orm";
 import {
   getServerSession,
   type DefaultSession,
@@ -6,12 +10,6 @@ import {
 } from "next-auth";
 import { type Adapter } from "next-auth/adapters";
 import CredentialsProvider from "next-auth/providers/credentials";
-import { env } from "@/env";
-import { db } from "@/server/db";
-import { createTable, shops, users } from "@/server/db/schema";
-import { eq } from "drizzle-orm";
-import { roles } from "./db/schema";
-import { compareSync } from "bcryptjs";
 
 /**
  * Module augmentation for `next-auth` types. Allows us to add custom properties to the `session`
@@ -23,13 +21,13 @@ declare module "next-auth" {
   interface Session extends DefaultSession {
     user: {
       id: string;
-      phone: string;
+      account: string;
       type:'shop'|'user'
     } & DefaultSession["user"];
   }
 
   interface User {
-    phone: string;
+    account: string;
   }
 }
 
@@ -51,18 +49,18 @@ export const authOptions: NextAuthOptions = {
     CredentialsProvider({
       name: "Credentials",
       credentials: {
-        phone: {},
+        account: {},
         password: {},
         type: {},
       },
       async authorize(credentials) {
-        if (!credentials?.phone || !credentials?.type) {
+        if (!credentials?.account || !credentials?.type) {
           return null;
         }
 
         if (credentials.type === "shop") {
           const shop = await db.query.shops.findFirst({
-            where: eq(shops.phone, credentials.phone),
+            where: eq(shops.account, credentials.account),
           });
           if (!shop) {
             throw new Error("用户不存在");
@@ -77,12 +75,12 @@ export const authOptions: NextAuthOptions = {
           return {
             id: shop?.id,
             name: shop?.name,
-            phone: shop?.phone,
+            account: shop?.phone,
             type:'shop'
           };
         }
         const user = await db.query.users.findFirst({
-          where: eq(users.phone, credentials.phone),
+          where: eq(users.account, credentials.account),
         });
         if (!user) {
           throw new Error("用户不存在");
@@ -90,7 +88,7 @@ export const authOptions: NextAuthOptions = {
         return {
           id: user?.id,
           name: user?.name,
-          phone: user?.phone,
+          account: user?.account,
           type:'user'
         };
       },
@@ -109,7 +107,7 @@ export const authOptions: NextAuthOptions = {
       return token;
     },
     session: ({ session, token }) => {
-      console.log("token", token);
+      // console.log("token", token);
 
       return {
         ...session,
