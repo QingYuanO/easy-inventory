@@ -1,9 +1,9 @@
-
 import { UpdateUserSchema } from "@/lib/schema/UpdateUserSchema";
 import { createTRPCRouter, protectedProcedure } from "@/server/api/trpc";
 import { shops, users, usersToShops } from "@/server/db/schema";
 import { TRPCError } from "@trpc/server";
 import { and, eq } from "drizzle-orm";
+import { z } from "zod";
 
 export const userRouter = createTRPCRouter({
   getUsersByShop: protectedProcedure.query(async ({ ctx }) => {
@@ -22,6 +22,7 @@ export const userRouter = createTRPCRouter({
         phone: users.phone,
         id: users.id,
         account: users.account,
+        isActivity: usersToShops.isActivity,
       })
       .from(usersToShops)
       .leftJoin(users, eq(usersToShops.userId, users.id))
@@ -29,6 +30,29 @@ export const userRouter = createTRPCRouter({
       .where(eq(shops.id, user.id));
     return userList;
   }),
+  switchUserActivity: protectedProcedure
+    .input(z.object({ userId: z.string(), status: z.boolean() }))
+    .mutation(async ({ ctx, input }) => {
+      const { session, db } = ctx;
+      const { user } = session;
+
+      if (user.type !== "shop") {
+        throw new TRPCError({
+          code: "UNAUTHORIZED",
+          message: "你无权切换用户状态",
+        });
+      }
+      await db
+        .update(usersToShops)
+        .set({ isActivity: input.status })
+        .where(
+          and(
+            eq(usersToShops.shopId, user.id),
+            eq(usersToShops.userId, input.userId),
+          ),
+        );
+      return { success: true };
+    }),
   create: protectedProcedure
     .input(UpdateUserSchema)
     .mutation(async ({ ctx, input }) => {

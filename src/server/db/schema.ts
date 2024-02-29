@@ -1,11 +1,12 @@
 import { relations, sql } from "drizzle-orm";
 import {
+  boolean,
   pgEnum,
   pgTableCreator,
   primaryKey,
   text,
   timestamp,
-  varchar
+  varchar,
 } from "drizzle-orm/pg-core";
 
 /**
@@ -30,7 +31,7 @@ export const shops = createTable("shop", {
     .default(sql`gen_random_uuid()`),
   name: varchar("name", { length: 255 }),
   phone: varchar("phone", { length: 11 }).notNull(),
-  account:varchar("account", { length: 20 }).notNull().unique(),
+  account: varchar("account", { length: 20 }).notNull().unique(),
   password: text("password").notNull(),
   ...baseColumn,
 });
@@ -46,7 +47,7 @@ export const users = createTable("user", {
     .default(sql`gen_random_uuid()`),
   name: varchar("name", { length: 255 }),
   phone: varchar("phone", { length: 11 }).notNull(),
-  account:varchar("account", { length: 20 }).notNull().unique(),
+  account: varchar("account", { length: 20 }).notNull().unique(),
   ...baseColumn,
 });
 
@@ -63,6 +64,7 @@ export const usersToShops = createTable(
     shopId: varchar("shop_id", { length: 255 })
       .notNull()
       .references(() => shops.id),
+    isActivity: boolean("is_activity").notNull().default(true),
   },
   (t) => ({
     pk: primaryKey({ columns: [t.userId, t.shopId] }),

@@ -9,11 +9,14 @@ import {
 } from "@/components/ui/card";
 import { api } from "@/trpc/server";
 import { Ghost } from "lucide-react";
+import SwitchActivityButton from "./_components/SwitchActivityButton";
 
 export default async function Page() {
-  const result = await api.user.getUsersByShop.query(undefined, {});
+  const result = await api.user.getUsersByShop.query(undefined, {
+    context: { next: { tags: ["getUsersByShop"] } },
+  });
   console.log(result);
-
+  
   return (
     <div className="py-12">
       <Header title="用户列表" isBack />
@@ -27,21 +30,19 @@ export default async function Page() {
               <CardHeader className="p-4 pb-2">
                 <CardTitle>{user.name}</CardTitle>
                 <CardDescription className="w-full">
-                  {user.phone}
+                  {user.account}
                 </CardDescription>
               </CardHeader>
               {/* <CardContent></CardContent> */}
               <CardFooter className="flex justify-between px-4 pb-4">
-                <Button size="sm" variant="default">
-                  拨打电话
+                <Button size="sm" variant="default" asChild>
+                  <a href={`tel:${user.phone}`}>拨打电话</a>
                 </Button>
                 <div className="flex gap-3">
-                  <Button size="sm" variant="destructive">
-                    停用
-                  </Button>
-                  <Button size="sm" variant="secondary">
+                  <SwitchActivityButton isActivity={user.isActivity} userId={user.id!} />
+                  {/* <Button size="sm" variant="secondary">
                     修改
-                  </Button>
+                  </Button> */}
                   <Button size="sm" variant="default">
                     查看
                   </Button>

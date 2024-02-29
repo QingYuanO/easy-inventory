@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useEffect, useState } from "react";
 
 import { useForm } from "react-hook-form";
 import { signIn } from "next-auth/react";
@@ -26,11 +26,11 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { genSaltSync, hashSync } from "bcryptjs";
-import { phoneRegex } from "@/lib/regExp";
+import { alphanumericRegex, phoneRegex } from "@/lib/regExp";
 
 const SignInSchema = z
   .object({
-    phone: z.string().regex(phoneRegex, "请输入正确的手机号!"),
+    account: z.string().regex(alphanumericRegex, "请输入正确的账号!"),
     type: z.enum(["user", "shop"]).default("user"),
     password: z.string().optional(),
   })
@@ -54,27 +54,28 @@ function hashPassword(password: string) {
 }
 
 export default function Page() {
-  // useEffect(() => {
-  //   hashPassword('123456')
-  // }, []);
+  useEffect(() => {
+    hashPassword("123456");
+  }, []);
 
   const router = useRouter();
   const form = useForm<z.infer<typeof SignInSchema>>({
     resolver: zodResolver(SignInSchema),
     defaultValues: {
-      phone: "",
+      account: "",
       type: "user",
       password: "",
     },
   });
   const { toast } = useToast();
+  const [isLoading, setIsLoading] = useState(false);
   const onSubmit = async (values: z.infer<typeof SignInSchema>) => {
+    setIsLoading(true);
     const signInData = await signIn("credentials", {
       ...values,
       redirect: false,
     });
-    console.log(signInData);
-
+    setIsLoading(false);
     if (signInData?.error) {
       console.error(signInData.error);
       toast({
@@ -97,12 +98,12 @@ export default function Page() {
           <div className="space-y-2">
             <FormField
               control={form.control}
-              name="phone"
+              name="account"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>手机号</FormLabel>
+                  <FormLabel>账号</FormLabel>
                   <FormControl>
-                    <Input placeholder="请输入手机号" {...field} />
+                    <Input placeholder="请输入账号" {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -152,7 +153,7 @@ export default function Page() {
               )}
             />
           </div>
-          <Button className="mt-6 w-full" type="submit">
+          <Button className="mt-6 w-full" type="submit" disabled={isLoading}>
             登录
           </Button>
         </form>

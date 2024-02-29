@@ -1,5 +1,6 @@
 "use client";
 
+import { revalidateUserList } from "@/app/shop/user-list/action";
 import { Button } from "@/components/ui/button";
 import {
   Form,
@@ -19,18 +20,28 @@ import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import * as z from "zod";
 
+interface UpdateUserFormProps {
+  type: "edit" | "create";
+  initData?: {
+    phone: string;
+    name: string;
+    account: string;
+  };
+}
 
-
-export default function InviteUserForm() {
+export default function UpdateUserForm({
+  type,
+  initData,
+}: UpdateUserFormProps) {
   const router = useRouter();
-  const utils = api.useUtils()
-  const { mutate, isLoading } = api.user.create.useMutation({
-    onSuccess() {
+  const createMutation = api.user.create.useMutation({
+    async onSuccess() {
       toast({
         description: "创建成功",
         variant: "default",
       });
-      router.refresh()
+      // router.refresh();
+      await revalidateUserList();
       setTimeout(() => {
         router.back();
       }, 500);
@@ -44,27 +55,29 @@ export default function InviteUserForm() {
   });
   const form = useForm<z.infer<typeof UpdateUserSchema>>({
     resolver: zodResolver(UpdateUserSchema),
-    defaultValues: {
-      phone: "",
-      name: "",
-      account: "",
-    },
+    defaultValues: initData
+      ? initData
+      : {
+          phone: "",
+          name: "",
+          account: "",
+        },
   });
   const { toast } = useToast();
   const onSubmit = async (values: z.infer<typeof UpdateUserSchema>) => {
     console.log(values);
-    mutate({
-      name: values.name,
-      phone: values.phone,
-      account: values.account,
-    });
+    if (type === "create") {
+      createMutation.mutate({
+        ...values,
+      });
+    }
   };
   return (
     <div>
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="w-full">
           <div className="space-y-2">
-          <FormField
+            <FormField
               control={form.control}
               name="account"
               render={({ field }) => (
@@ -105,7 +118,11 @@ export default function InviteUserForm() {
               )}
             />
           </div>
-          <Button className="mt-6 w-full" type="submit" disabled={isLoading}>
+          <Button
+            className="mt-6 w-full"
+            type="submit"
+            disabled={type === "create" ? createMutation.isLoading : false}
+          >
             创建
           </Button>
         </form>

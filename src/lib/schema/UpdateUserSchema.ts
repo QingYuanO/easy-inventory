@@ -10,5 +10,6 @@ export const UpdateUserSchema = z.object({
   account: z
     .string()
     .min(1, "账号不能为空")
+    .max(20, "账号不能超过20个字符")
     .regex(alphanumericRegex, "只能输入数字和字母!"),
 });

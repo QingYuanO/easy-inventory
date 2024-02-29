@@ -28,7 +28,7 @@ export default async function Page() {
         </p>
       </div>
 
-      <div className="grid grid-cols-2 gap-4 p-4 mt-4">
+      <div className="mt-4 grid grid-cols-2 gap-4 p-4">
         <Card className="col-span-1 flex flex-col justify-between">
           <CardHeader>
             <CardTitle>创建用户</CardTitle>
@@ -63,7 +63,7 @@ export default async function Page() {
           <CardHeader>
             <CardTitle>用户列表</CardTitle>
             <CardDescription className="w-full">
-              查看所有用户及其对应的清单              
+              查看所有用户及其对应的清单
             </CardDescription>
           </CardHeader>
           <CardContent>

@@ -22,12 +22,14 @@ declare module "next-auth" {
     user: {
       id: string;
       account: string;
+      phone: string;
       type:'shop'|'user'
     } & DefaultSession["user"];
   }
 
   interface User {
     account: string;
+    phone: string;
   }
 }
 
@@ -76,6 +78,7 @@ export const authOptions: NextAuthOptions = {
             id: shop?.id,
             name: shop?.name,
             account: shop?.phone,
+            phone: shop?.phone,
             type:'shop'
           };
         }
@@ -89,6 +92,7 @@ export const authOptions: NextAuthOptions = {
           id: user?.id,
           name: user?.name,
           account: user?.account,
+          phone: user?.phone,
           type:'user'
         };
       },
@@ -107,13 +111,15 @@ export const authOptions: NextAuthOptions = {
       return token;
     },
     session: ({ session, token }) => {
-      // console.log("token", token);
+      console.log("token", token);
+
 
       return {
         ...session,
         user: {
           ...session.user,
           id: token.id,
+          account: token.account,
           phone: token.phone,
           type:token.type
         },
