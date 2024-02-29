@@ -10,5 +10,7 @@ export default async function Home() {
   console.log(session?.user.type);
   
   if (!session) redirect("/sign-in");
-  return <main className=""></main>;
+  if(session.user.type === 'shop') redirect("/401");
+  // if(session.user.type === 'user') redirect("/laundry-list");
+  return <main className="">user</main>;
 }

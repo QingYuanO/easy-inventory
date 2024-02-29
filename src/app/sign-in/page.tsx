@@ -1,10 +1,9 @@
 "use client";
 
-import React, { useEffect } from "react";
+import React from "react";
 
 import { useForm } from "react-hook-form";
 import { signIn } from "next-auth/react";
-import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
@@ -12,7 +11,6 @@ import { Button } from "@/components/ui/button";
 import {
   Form,
   FormControl,
-  FormDescription,
   FormField,
   FormItem,
   FormLabel,
@@ -27,9 +25,9 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { genSaltSync,hashSync } from "bcryptjs";
+import { genSaltSync, hashSync } from "bcryptjs";
+import { phoneRegex } from "@/lib/regExp";
 
-const phoneRegex = new RegExp(/^(?:(?:\+|00)86)?1[3-9]\d{9}$/);
 const SignInSchema = z
   .object({
     phone: z.string().regex(phoneRegex, "请输入正确的手机号!"),
@@ -51,12 +49,11 @@ function hashPassword(password: string) {
   const salt = genSaltSync(10);
   const hashedPassword = hashSync(password, salt);
   console.log(hashedPassword);
-  
+
   return hashedPassword;
 }
 
 export default function Page() {
-
   // useEffect(() => {
   //   hashPassword('123456')
   // }, []);
@@ -72,7 +69,6 @@ export default function Page() {
   });
   const { toast } = useToast();
   const onSubmit = async (values: z.infer<typeof SignInSchema>) => {
-    console.log(values);
     const signInData = await signIn("credentials", {
       ...values,
       redirect: false,
@@ -87,7 +83,11 @@ export default function Page() {
         variant: "destructive",
       });
     } else {
-      router.replace("/");
+      if (values.type === "shop") {
+        router.replace("/shop");
+      } else {
+        router.replace("/");
+      }
     }
   };
   return (
@@ -116,7 +116,11 @@ export default function Page() {
                   <FormItem>
                     <FormLabel>密码</FormLabel>
                     <FormControl>
-                      <Input placeholder="请输入密码" type="password" {...field} />
+                      <Input
+                        placeholder="请输入密码"
+                        type="password"
+                        {...field}
+                      />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
