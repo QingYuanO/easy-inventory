@@ -1,5 +1,5 @@
 import Header from "@/components/Header";
-import UpdateUserForm from "@/components/UpdateUserForm";
+import EditUserForm from "@/components/EditUserForm";
 import React from "react";
 
 export default function Page() {
@@ -7,7 +7,7 @@ export default function Page() {
     <div className="py-12">
       <Header title="创建用户" isBack />
       <div className="p-4">
-        <UpdateUserForm type="create" />
+        <EditUserForm type="create" />
       </div>
     </div>
   );

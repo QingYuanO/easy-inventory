@@ -1,7 +1,7 @@
 import { z } from "zod";
 import { alphanumericRegex, phoneRegex } from "../regExp";
 
-export const UpdateUserSchema = z.object({
+export const EditUserSchema = z.object({
   phone: z
     .string()
     .min(1, "手机号不能为空")

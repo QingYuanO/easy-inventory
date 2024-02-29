@@ -1,4 +1,4 @@
-import { UpdateUserSchema } from "@/lib/schema/UpdateUserSchema";
+import { EditUserSchema } from "@/lib/schema/EditUserSchema";
 import { createTRPCRouter, protectedProcedure } from "@/server/api/trpc";
 import { shops, users, usersToShops } from "@/server/db/schema";
 import { TRPCError } from "@trpc/server";
@@ -54,7 +54,7 @@ export const userRouter = createTRPCRouter({
       return { success: true };
     }),
   create: protectedProcedure
-    .input(UpdateUserSchema)
+    .input(EditUserSchema)
     .mutation(async ({ ctx, input }) => {
       const { session, db } = ctx;
       const { user } = session;

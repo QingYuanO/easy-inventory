@@ -13,15 +13,15 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/components/ui/use-toast";
-import { UpdateUserSchema } from "@/lib/schema/UpdateUserSchema";
+import { EditUserSchema } from "@/lib/schema/EditUserSchema";
 import { api } from "@/trpc/react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import * as z from "zod";
 
-interface UpdateUserFormProps {
-  type: "edit" | "create";
+interface EditUserFormProps {
+  type: "update" | "create";
   initData?: {
     phone: string;
     name: string;
@@ -29,10 +29,10 @@ interface UpdateUserFormProps {
   };
 }
 
-export default function UpdateUserForm({
+export default function EditUserForm({
   type,
   initData,
-}: UpdateUserFormProps) {
+}: EditUserFormProps) {
   const router = useRouter();
   const createMutation = api.user.create.useMutation({
     async onSuccess() {
@@ -53,8 +53,8 @@ export default function UpdateUserForm({
       });
     },
   });
-  const form = useForm<z.infer<typeof UpdateUserSchema>>({
-    resolver: zodResolver(UpdateUserSchema),
+  const form = useForm<z.infer<typeof EditUserSchema>>({
+    resolver: zodResolver(EditUserSchema),
     defaultValues: initData
       ? initData
       : {
@@ -64,7 +64,7 @@ export default function UpdateUserForm({
         },
   });
   const { toast } = useToast();
-  const onSubmit = async (values: z.infer<typeof UpdateUserSchema>) => {
+  const onSubmit = async (values: z.infer<typeof EditUserSchema>) => {
     console.log(values);
     if (type === "create") {
       createMutation.mutate({
