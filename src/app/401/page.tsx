@@ -14,7 +14,7 @@ export default async function Page() {
         <XCircle className="size-20  text-red-400" />
         <p>您没有权限访问</p>
         <Link
-          href={session?.user.type === "shop" ? "/laundry-list" : "/"}
+          href={session?.user.type === "shop" ? "/shop" : "/"}
           className={buttonVariants({
             variant: "secondary",
           })}
