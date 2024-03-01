@@ -34,7 +34,8 @@ export default function EditUserForm({ type, initData }: EditUserFormProps) {
     async onSuccess() {
       toast({
         description: "创建成功",
-        variant: "default",
+        variant: "success",
+        duration: 2000,
       });
       // router.refresh();
       await utils.user.getUsersByShop.invalidate();

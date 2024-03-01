@@ -11,10 +11,7 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/components/ui/use-toast";
-import {
-  EditGoodsSchema,
-  type EditGoodsType,
-} from "@/lib/schema/GoodsSchema";
+import { EditGoodsSchema, type EditGoodsType } from "@/lib/schema/GoodsSchema";
 import { api } from "@/trpc/react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useRouter } from "next/navigation";
@@ -57,7 +54,7 @@ export default function EditGoodsForm({ type, goodsId }: EditGoodsFormProps) {
     async onSuccess() {
       toast({
         description: "创建成功",
-        variant: "default",
+        variant: "success",
         duration: 2000,
       });
       await utils.goods.getGoodsByShop.invalidate();
@@ -77,7 +74,8 @@ export default function EditGoodsForm({ type, goodsId }: EditGoodsFormProps) {
     async onSuccess() {
       toast({
         description: "修改成功",
-        variant: "default",
+        variant: "success",
+        duration: 2000,
       });
       await utils.goods.getGoodsByShop.invalidate();
       setTimeout(() => {
