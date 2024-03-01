@@ -9,7 +9,7 @@ export default async function ShopLayout({ children }: PropsWithChildren) {
   if (session.user.type !== "shop") redirect("/401");
 
   return (
-    <div>
+    <div >
       {children}
       <ShopTabBar />
     </div>

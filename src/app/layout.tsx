@@ -34,10 +34,12 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={`bg-background text-foreground ${lxgw.className}`}>
-        <NextAuthProvider>
-          <TRPCReactProvider>{children}</TRPCReactProvider>
-        </NextAuthProvider>
-        <Toaster />
+        <main className="relative mx-auto max-w-2xl">
+          <NextAuthProvider>
+            <TRPCReactProvider>{children}</TRPCReactProvider>
+          </NextAuthProvider>
+          <Toaster />
+        </main>
       </body>
     </html>
   );

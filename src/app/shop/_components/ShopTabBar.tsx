@@ -15,7 +15,7 @@ export default function ShopTabBar() {
 
   if (!["/shop", "/shop/me"].includes(pathname ?? "")) return null;
   return (
-    <div className="fixed bottom-0 left-0 right-0 flex h-14 items-center justify-around border-t border-border text-sm text-zinc-400 ">
+    <div className="fixed bottom-0 left-0 right-0 flex h-14 items-center justify-around border-t border-border text-sm text-zinc-400 sm:mx-auto sm:max-w-2xl ">
       <Link
         href="/shop"
         className={buttonVariants({
