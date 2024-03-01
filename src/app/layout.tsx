@@ -1,13 +1,23 @@
 import "@/styles/globals.css";
-
-import { Inter } from "next/font/google";
-
 import { TRPCReactProvider } from "@/trpc/react";
 import { Toaster } from "@/components/ui/toaster";
 import NextAuthProvider from "@/components/providers/NextAuthProvider";
-const inter = Inter({
-  subsets: ["latin"],
-  variable: "--font-sans",
+import localFont from "next/font/local";
+const lxgw = localFont({
+  src: [
+    {
+      path: "./fonts/LXGWWenKaiLite-Regular.ttf",
+      weight: "400",
+      style: "normal",
+    },
+    {
+      path: "./fonts/LXGWWenKaiLite-Bold.ttf",
+      weight: "700",
+      style: "normal",
+    },
+  ],
+  display: "swap",
+  variable: "--font-lxgw",
 });
 
 export const metadata = {
@@ -23,9 +33,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body
-        className={`bg-background font-sans text-foreground ${inter.variable}`}
-      >
+      <body className={`bg-background text-foreground ${lxgw.className}`}>
         <NextAuthProvider>
           <TRPCReactProvider>{children}</TRPCReactProvider>
         </NextAuthProvider>

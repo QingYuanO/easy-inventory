@@ -20,7 +20,7 @@ export default function Page() {
     );
   const list = data?.pages.flatMap((page) => page.list);
   return (
-    <div className="pt-12">
+    <div className="pt-14">
       <Header
         title="管理商品"
         rightContent={
@@ -42,16 +42,16 @@ export default function Page() {
         <InfiniteScroll
           dataLength={list.length}
           next={fetchNextPage}
-          className="grid grid-cols-2 gap-4 p-4"
+          className="flex flex-col gap-4 p-4"
           hasMore={!!hasNextPage}
           loader={
-            <div className="col-span-2 flex items-center justify-center">
+            <div className=" flex items-center justify-center">
               <Loader2 className="size-4" />
               <p className="text-sm">加载中</p>
             </div>
           }
           endMessage={
-            <div className="col-span-2 flex items-center justify-center">
+            <div className=" flex items-center justify-center">
               <p className="text-sm text-muted-foreground">没有更多了</p>
             </div>
           }
@@ -59,7 +59,7 @@ export default function Page() {
           {list?.map((goods) => (
             <div
               key={goods.id}
-              className="col-span-1 flex flex-col gap-2 rounded-lg border border-border bg-card p-4 shadow"
+              className="flex flex-col gap-2 rounded-lg border border-border bg-card p-4 shadow"
             >
               <div className="flex flex-col gap-1">
                 <p className="text font-bold">{goods.name}</p>

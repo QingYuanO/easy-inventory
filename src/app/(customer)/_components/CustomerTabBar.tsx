@@ -12,7 +12,7 @@ export default function CustomerTabBar() {
 
   if (!["/", "/me"].includes(pathname ?? "")) return null;
   return (
-    <div className="fixed bottom-0 left-0 right-0 flex h-12 items-center justify-around border-t border-border text-sm text-zinc-400 ">
+    <div className="fixed bottom-0 left-0 right-0 flex h-14 items-center justify-around border-t border-border text-sm text-zinc-400 ">
       <Link
         href="/"
         className={buttonVariants({

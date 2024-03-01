@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 
 import { useForm } from "react-hook-form";
 import { signIn } from "next-auth/react";
@@ -25,8 +25,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { genSaltSync, hashSync } from "bcryptjs";
-import { alphanumericRegex, phoneRegex } from "@/lib/regExp";
+import { alphanumericRegex } from "@/lib/regExp";
+import Image from "next/image";
 
 const SignInSchema = z
   .object({
@@ -44,20 +44,7 @@ const SignInSchema = z
     }
   });
 
-function hashPassword(password: string) {
-  // 使用bcryptjs对密码进行哈希处理
-  const salt = genSaltSync(10);
-  const hashedPassword = hashSync(password, salt);
-  console.log(hashedPassword);
-
-  return hashedPassword;
-}
-
 export default function Page() {
-  useEffect(() => {
-    hashPassword("123456");
-  }, []);
-
   const router = useRouter();
   const form = useForm<z.infer<typeof SignInSchema>>({
     resolver: zodResolver(SignInSchema),
@@ -92,9 +79,16 @@ export default function Page() {
     }
   };
   return (
-    <div className="flex min-h-screen w-full items-center justify-center px-4">
+    <div className="flex min-h-screen w-full flex-col items-center gap-10 px-8 py-20">
+      <div className=" flex flex-col items-center gap-4">
+        <p className="text-2xl font-semibold">Easy 清单</p>
+        <p className="text-muted-foreground">易于使用的货物配送清单管理工具</p>
+      </div>
       <Form {...form}>
-        <form onSubmit={form.handleSubmit(onSubmit)} className="w-full">
+        <form
+          onSubmit={form.handleSubmit(onSubmit)}
+          className="w-full rounded border border-border px-8 py-10"
+        >
           <div className="space-y-2">
             <FormField
               control={form.control}

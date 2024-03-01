@@ -77,7 +77,7 @@ export default async function Page() {
           </CardContent>
         </Card>
       </div>
-      <div className="mt-4 flex justify-center p-4">
+      <div className="mt-4 flex justify-center p-4 fixed bottom-16 left-0 w-full">
         <LogoutButton />
       </div>
     </div>

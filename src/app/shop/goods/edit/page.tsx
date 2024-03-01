@@ -13,7 +13,7 @@ export default function Page({
     update: "修改商品",
   }[searchParams.type];
   return (
-    <div className="pt-12">
+    <div className="pt-14">
       <Header title={title} isBack />
       <div className="p-4">
         <EditGoodsForm
