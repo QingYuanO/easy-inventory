@@ -1,6 +1,4 @@
 "use client";
-
-import { revalidateUserList } from "@/app/shop/user-list/action";
 import { Button } from "@/components/ui/button";
 import {
   Form,
@@ -13,7 +11,7 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/components/ui/use-toast";
-import { EditUserSchema } from "@/lib/schema/EditUserSchema";
+import { EditUserSchema } from "@/lib/schema/UserSchema";
 import { api } from "@/trpc/react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useRouter } from "next/navigation";
@@ -29,10 +27,8 @@ interface EditUserFormProps {
   };
 }
 
-export default function EditUserForm({
-  type,
-  initData,
-}: EditUserFormProps) {
+export default function EditUserForm({ type, initData }: EditUserFormProps) {
+  const utils = api.useUtils();
   const router = useRouter();
   const createMutation = api.user.create.useMutation({
     async onSuccess() {
@@ -41,7 +37,7 @@ export default function EditUserForm({
         variant: "default",
       });
       // router.refresh();
-      await revalidateUserList();
+      await utils.user.getUsersByShop.invalidate();
       setTimeout(() => {
         router.back();
       }, 500);

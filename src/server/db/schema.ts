@@ -4,6 +4,7 @@ import {
   pgEnum,
   pgTableCreator,
   primaryKey,
+  serial,
   text,
   timestamp,
   varchar,
@@ -38,6 +39,7 @@ export const shops = createTable("shop", {
 
 export const shopRelations = relations(shops, ({ many }) => ({
   usersToShops: many(usersToShops),
+  goods: many(goods),
 }));
 
 export const users = createTable("user", {
@@ -78,6 +80,26 @@ export const usersToShopsRelations = relations(usersToShops, ({ one }) => ({
   }),
   shop: one(shops, {
     fields: [usersToShops.shopId],
+    references: [shops.id],
+  }),
+}));
+
+export const goods = createTable("goods", {
+  id: varchar("id", { length: 255 })
+    .notNull()
+    .primaryKey()
+    .default(sql`gen_random_uuid()`),
+  cursor: serial("cursor").notNull().unique(),
+  name: varchar("name", { length: 255 }).notNull().unique(),
+  description: text("description"),
+  cover: varchar("cover", { length: 255 }),
+  shopId: varchar("shop_id", { length: 255 }).notNull(),
+  ...baseColumn,
+});
+
+export const goodsRelations = relations(goods, ({ one }) => ({
+  shop: one(shops, {
+    fields: [goods.shopId],
     references: [shops.id],
   }),
 }));

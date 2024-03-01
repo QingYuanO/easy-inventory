@@ -1,4 +1,4 @@
-import { EditUserSchema } from "@/lib/schema/EditUserSchema";
+import { EditUserSchema } from "@/lib/schema/UserSchema";
 import { createTRPCRouter, protectedProcedure } from "@/server/api/trpc";
 import { shops, users, usersToShops } from "@/server/db/schema";
 import { TRPCError } from "@trpc/server";

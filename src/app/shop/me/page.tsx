@@ -1,3 +1,4 @@
+import LogoutButton from "@/components/LogoutButton";
 import { buttonVariants } from "@/components/ui/button";
 import {
   Card,
@@ -39,7 +40,7 @@ export default async function Page() {
               href="/shop/invite-user"
               className={buttonVariants({ variant: "secondary" })}
             >
-              立即邀请 <ChevronRight />
+              立即创建 <ChevronRight />
             </Link>
           </CardContent>
         </Card>
@@ -52,7 +53,7 @@ export default async function Page() {
           </CardHeader>
           <CardContent>
             <Link
-              href="/sign-up"
+              href="/shop/goods"
               className={buttonVariants({ variant: "secondary" })}
             >
               立即前往 <ChevronRight />
@@ -71,10 +72,13 @@ export default async function Page() {
               href="/shop/user-list"
               className={buttonVariants({ variant: "secondary" })}
             >
-              立即前往 <ChevronRight />
+              立即查看 <ChevronRight />
             </Link>
           </CardContent>
         </Card>
+      </div>
+      <div className="mt-4 flex justify-center p-4">
+        <LogoutButton />
       </div>
     </div>
   );
