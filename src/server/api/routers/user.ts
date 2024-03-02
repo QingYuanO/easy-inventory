@@ -91,21 +91,23 @@ export const userRouter = createTRPCRouter({
           return { success: true };
         }
       } else {
-        const res = await db
-          .insert(users)
-          .values({
-            name: input.name,
-            phone: input.phone,
-            account: input.account,
-          })
-          .returning();
-        const newUser = res[0];
-        if (newUser) {
-          await db
-            .insert(usersToShops)
-            .values({ shopId: user.id, userId: newUser.id });
-        }
-        return { success: true };
+        await db.transaction(async (tx) => {
+          const res = await tx
+            .insert(users)
+            .values({
+              name: input.name,
+              phone: input.phone,
+              account: input.account,
+            })
+            .returning();
+          const newUser = res[0];
+          if (newUser) {
+            await tx
+              .insert(usersToShops)
+              .values({ shopId: user.id, userId: newUser.id });
+          }
+          return { success: true };
+        });
       }
     }),
 });
