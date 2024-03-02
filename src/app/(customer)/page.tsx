@@ -22,7 +22,7 @@ export default function Page() {
   const list = data?.pages.flatMap((page) => page.list);
   return (
     <div className="py-14">
-      <Header title={`${selectedShop?.name}的商品`} />
+      <Header title={`${selectedShop?.name ?? "xxx"}的商品`} />
       {isLoading ? (
         <div className="mt-20 flex items-center justify-center">
           <Loader2 className="size-6 animate-spin" />
