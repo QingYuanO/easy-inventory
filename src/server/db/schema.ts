@@ -34,6 +34,7 @@ export const shops = createTable("shop", {
   phone: varchar("phone", { length: 11 }).notNull(),
   account: varchar("account", { length: 20 }).notNull().unique(),
   password: text("password").notNull(),
+  description: text("description"),
   ...baseColumn,
 });
 
@@ -66,7 +67,9 @@ export const usersToShops = createTable(
     shopId: varchar("shop_id", { length: 255 })
       .notNull()
       .references(() => shops.id),
+      //账号是否被商家锁定
     isActivity: boolean("is_activity").notNull().default(true),
+    isSelected: boolean("is_selected").notNull().default(false),
   },
   (t) => ({
     pk: primaryKey({ columns: [t.userId, t.shopId] }),

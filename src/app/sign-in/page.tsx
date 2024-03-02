@@ -26,7 +26,6 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { alphanumericRegex } from "@/lib/regExp";
-import Image from "next/image";
 
 const SignInSchema = z
   .object({
@@ -46,6 +45,9 @@ const SignInSchema = z
 
 export default function Page() {
   const router = useRouter();
+
+  // const lastLoginUser = window.localStorage?.getItem("lastLoginUser") ?? "";
+
   const form = useForm<z.infer<typeof SignInSchema>>({
     resolver: zodResolver(SignInSchema),
     defaultValues: {
@@ -71,6 +73,7 @@ export default function Page() {
         variant: "destructive",
       });
     } else {
+      localStorage.setItem("lastLoginUser", values.account);
       if (values.type === "shop") {
         router.replace("/shop");
       } else {

@@ -168,4 +168,82 @@ export const goodsRouter = createTRPCRouter({
         .where(eq(goods.id, input.goodsId));
       return { success: true };
     }),
+
+  getGoodsByShopOfSelected: protectedProcedure
+    .input(
+      z.object({
+        limit: z.number().min(1).max(100).nullish(),
+        cursor: z.number().nullish(),
+      }),
+    )
+    .query(async ({ ctx, input }) => {
+      const { session, db } = ctx;
+      const { user } = session;
+      const { cursor } = input;
+      const limit = input.limit ?? 10;
+
+      
+      const selectedShopRes = await db
+        .select({ shopId: usersToShops.shopId })
+        .from(usersToShops)
+        .leftJoin(users, eq(usersToShops.userId, users.id))
+        .leftJoin(shops, eq(usersToShops.shopId, shops.id))
+        .where(
+          and(
+            eq(usersToShops.userId, user.id),
+            eq(usersToShops.isSelected, true),
+          ),
+        );
+
+      let shopId;
+      if (selectedShopRes.length > 0) {
+        const selectedShop = selectedShopRes[0];
+        shopId = selectedShop?.shopId;
+      } else {
+        const first = await db.query.usersToShops.findFirst({
+          where: eq(usersToShops.userId, user.id),
+        });
+
+        if (first) {
+          await db.insert(usersToShops).values({ ...first, isSelected: true });
+          shopId = first.shopId;
+        } else {
+          //说名该用户没有绑定店铺
+          return {
+            list: [],
+            nextCursor: null,
+          };
+        }
+      }
+
+      if (!shopId) {
+        return {
+          list: [],
+          nextCursor: null,
+        };
+      }
+      const goodsList = await db.query.goods.findMany(
+        withCursorPagination({
+          where: eq(goods.shopId, shopId),
+          limit: limit + 1,
+          cursors: [
+            [
+              goods.cursor, // Column to use for cursor
+              "desc", // Sort order ('asc' or 'desc')
+              cursor ? cursor - 1 : undefined, // Cursor value
+            ],
+          ],
+        }),
+      );
+      let nextCursor: typeof cursor | undefined = undefined;
+      if (goodsList.length > limit) {
+        const nextItem = goodsList.pop();
+        nextCursor = nextItem!.cursor;
+      }
+
+      return {
+        list: goodsList,
+        nextCursor,
+      };
+    }),
 });

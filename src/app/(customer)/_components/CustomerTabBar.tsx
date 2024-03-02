@@ -2,7 +2,7 @@
 import Link from "next/link";
 import React from "react";
 
-import { Store, UserRound } from "lucide-react";
+import { Store, User, UserRound } from "lucide-react";
 import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
 import { buttonVariants } from "@/components/ui/button";
@@ -30,7 +30,7 @@ export default function CustomerTabBar() {
           className: cn(pathname === "/me" && "text-foreground"),
         })}
       >
-        <UserRound className="mr-0.5 size-4" />
+        <User className="mr-0.5 size-4" />
         我的
       </Link>
     </div>

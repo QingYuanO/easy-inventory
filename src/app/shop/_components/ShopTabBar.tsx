@@ -2,7 +2,7 @@
 import Link from "next/link";
 import React from "react";
 
-import { ClipboardList, UserRound } from "lucide-react";
+import { ClipboardList, User, UserRound } from "lucide-react";
 import { usePathname, useSelectedLayoutSegment } from "next/navigation";
 import { cn } from "@/lib/utils";
 import { buttonVariants } from "@/components/ui/button";
@@ -33,7 +33,7 @@ export default function ShopTabBar() {
           className: cn(pathname === "/shop/me" && "text-foreground"),
         })}
       >
-        <UserRound className="mr-0.5 size-4" />
+        <User className="mr-0.5 size-4" />
         我的
       </Link>
     </div>
