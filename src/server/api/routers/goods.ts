@@ -150,4 +150,22 @@ export const goodsRouter = createTRPCRouter({
         throw new TRPCError({ code: "CONFLICT", message: "商品不存在" });
       }
     }),
+  switchGoodsActivity: protectedProcedure
+    .input(z.object({ goodsId: z.string(), status: z.boolean() }))
+    .mutation(async ({ ctx, input }) => {
+      const { session, db } = ctx;
+      const { user } = session;
+
+      if (user.type !== "shop") {
+        throw new TRPCError({
+          code: "UNAUTHORIZED",
+          message: "你无权切换商品状态",
+        });
+      }
+      await db
+        .update(goods)
+        .set({ isActivity: input.status })
+        .where(eq(goods.id, input.goodsId));
+      return { success: true };
+    }),
 });

@@ -94,6 +94,7 @@ export const goods = createTable("goods", {
   description: text("description"),
   cover: varchar("cover", { length: 255 }),
   shopId: varchar("shop_id", { length: 255 }).notNull(),
+  isActivity: boolean("is_activity").notNull().default(true),
   ...baseColumn,
 });
 

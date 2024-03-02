@@ -7,6 +7,7 @@ import { Ghost, Loader2 } from "lucide-react";
 import Link from "next/link";
 import React from "react";
 import InfiniteScroll from "react-infinite-scroll-component";
+import SwitchGoodsActivityButton from "./_components/SwitchGoodsActivityButton";
 export default function Page() {
   const { data, isLoading, fetchNextPage, hasNextPage } =
     api.goods.getGoodsByShop.useInfiniteQuery(
@@ -67,11 +68,15 @@ export default function Page() {
                   {goods.description}
                 </p>
               </div>
-              <div className="flex justify-end">
+              <div className="flex justify-end gap-2">
+                <SwitchGoodsActivityButton
+                  isActivity={goods.isActivity}
+                  goodsId={goods.id}
+                />
                 <Link
                   href={`/shop/goods/edit?type=update&goodsId=${goods.id}`}
                   className={buttonVariants({
-                    variant: "secondary",
+                    variant: "default",
                     size: "sm",
                   })}
                 >
