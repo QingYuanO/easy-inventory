@@ -1,6 +1,8 @@
 import { relations, sql } from "drizzle-orm";
 import {
   boolean,
+  integer,
+  json,
   pgEnum,
   pgTableCreator,
   primaryKey,
@@ -23,8 +25,6 @@ const baseColumn = {
   updatedAt: timestamp("updated_at").defaultNow(),
 };
 
-export const roles = pgEnum("sgl_role", ["user", "admin"]);
-
 export const shops = createTable("shop", {
   id: varchar("id", { length: 255 })
     .notNull()
@@ -41,6 +41,7 @@ export const shops = createTable("shop", {
 export const shopRelations = relations(shops, ({ many }) => ({
   usersToShops: many(usersToShops),
   goods: many(goods),
+  inventories: many(inventories),
 }));
 
 export const users = createTable("user", {
@@ -56,6 +57,7 @@ export const users = createTable("user", {
 
 export const userRelations = relations(users, ({ many }) => ({
   usersToShops: many(usersToShops),
+  inventories: many(inventories),
 }));
 
 export const usersToShops = createTable(
@@ -67,7 +69,7 @@ export const usersToShops = createTable(
     shopId: varchar("shop_id", { length: 255 })
       .notNull()
       .references(() => shops.id),
-      //账号是否被商家锁定
+    //账号是否被商家锁定
     isActivity: boolean("is_activity").notNull().default(true),
     isSelected: boolean("is_selected").notNull().default(false),
   },
@@ -101,9 +103,73 @@ export const goods = createTable("goods", {
   ...baseColumn,
 });
 
-export const goodsRelations = relations(goods, ({ one }) => ({
+export const goodsRelations = relations(goods, ({ one, many }) => ({
   shop: one(shops, {
     fields: [goods.shopId],
     references: [shops.id],
   }),
+  goodsToInventories: many(goodsToInventories),
 }));
+
+export const inventoryEnum = pgEnum("status", [
+  "PROGRESS",
+  "DONE",
+  "REFUSE",
+  "WAIT",
+]);
+
+
+export const inventories = createTable("inventories", {
+  id: varchar("id", { length: 255 })
+    .notNull()
+    .primaryKey()
+    .default(sql`gen_random_uuid()`),
+  cursor: serial("cursor").notNull().unique(),
+  name: varchar("name", { length: 255 }).notNull(),
+  memo: text("memo"),
+  shopId: varchar("shop_id", { length: 255 })
+    .notNull()
+    .references(() => shops.id),
+  userId: varchar("user_id", { length: 255 })
+    .notNull()
+    .references(() => users.id),
+  status: inventoryEnum("WAIT").notNull(),
+  ...baseColumn,
+});
+
+export const inventoriesRelations = relations(inventories, ({ one, many }) => ({
+  shop: one(shops, {
+    fields: [inventories.shopId],
+    references: [shops.id],
+  }),
+  user: one(users, {
+    fields: [inventories.userId],
+    references: [users.id],
+  }),
+  goodsToInventories: many(goodsToInventories),
+}));
+
+export const goodsToInventories = createTable("goods_to_inventories", {
+  goodsId: varchar("goods_id", { length: 255 })
+    .notNull()
+    .references(() => goods.id),
+  inventoryId: varchar("inventory_id", { length: 255 })
+    .notNull()
+    .references(() => inventories.id),
+  num: integer("num").notNull(),
+  memo: text("memo"),
+});
+
+export const goodsToInventoriesRelations = relations(
+  goodsToInventories,
+  ({ one }) => ({
+    goods: one(goods, {
+      fields: [goodsToInventories.goodsId],
+      references: [goods.id],
+    }),
+    inventory: one(inventories, {
+      fields: [goodsToInventories.inventoryId],
+      references: [inventories.id],
+    }),
+  }),
+);

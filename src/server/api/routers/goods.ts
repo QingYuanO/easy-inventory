@@ -2,7 +2,7 @@ import { EditGoodsSchema } from "@/lib/schema/GoodsSchema";
 import { createTRPCRouter, protectedProcedure } from "@/server/api/trpc";
 import { goods, shops, users, usersToShops } from "@/server/db/schema";
 import { TRPCError } from "@trpc/server";
-import { and, eq } from "drizzle-orm";
+import { and, eq, ilike, like } from "drizzle-orm";
 import { z } from "zod";
 import { withCursorPagination } from "drizzle-pagination";
 
@@ -168,12 +168,13 @@ export const goodsRouter = createTRPCRouter({
         .where(eq(goods.id, input.goodsId));
       return { success: true };
     }),
-
+  //查找客户当前选择的店铺下的商品
   getGoodsByShopOfSelected: protectedProcedure
     .input(
       z.object({
         limit: z.number().min(1).max(100).nullish(),
         cursor: z.number().nullish(),
+        name: z.string().optional(),
       }),
     )
     .query(async ({ ctx, input }) => {
@@ -182,7 +183,6 @@ export const goodsRouter = createTRPCRouter({
       const { cursor } = input;
       const limit = input.limit ?? 10;
 
-      
       const selectedShopRes = await db
         .select({ shopId: usersToShops.shopId })
         .from(usersToShops)
@@ -222,9 +222,18 @@ export const goodsRouter = createTRPCRouter({
           nextCursor: null,
         };
       }
+      console.log(input.name);
+      
+      const where = input.name
+        ? and(
+            eq(goods.shopId, shopId),
+            eq(goods.isActivity, true),
+            like(goods.name, `%${input.name}%`),
+          )
+        : and(eq(goods.shopId, shopId), eq(goods.isActivity, true));
       const goodsList = await db.query.goods.findMany(
         withCursorPagination({
-          where: eq(goods.shopId, shopId),
+          where: where,
           limit: limit + 1,
           cursors: [
             [

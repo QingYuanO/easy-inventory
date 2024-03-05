@@ -21,7 +21,7 @@ export default function Page() {
   const list = data?.pages.flatMap((page) => page.list);
   return (
     <div className="pb-28 pt-14">
-      <Header title="清单" />
+      <Header title="我的清单" isBack />
 
       {isLoading ? (
         <div className="mt-20 flex items-center justify-center">
@@ -65,10 +65,10 @@ export default function Page() {
               </div>
               <div className="flex flex-col gap-1 pt-2">
                 <p className="text-sm text-foreground">
-                  用户：{item.user.name}
+                  店家：{item.shop.name}
                 </p>
                 <p className="text-sm text-foreground">
-                  电话：{item.user.phone}
+                  电话：{item.shop.phone}
                 </p>
                 <p className="text-sm text-foreground">
                   商品：共{item.goodsToInventories.length}种
@@ -76,10 +76,10 @@ export default function Page() {
               </div>
               <div className="flex justify-between pt-2">
                 <Button variant={"secondary"} size="sm" asChild>
-                  <a href={`tel:${item.user.phone}`}>拨打电话</a>
+                  <a href={`tel:${item.shop.phone}`}>拨打电话</a>
                 </Button>
                 <Button variant={"default"} size="sm" asChild>
-                  <Link href={`/shop/inventory/${item.id}`}>详情</Link>
+                  <Link href={`/my-inventory/${item.id}`}>详情</Link>
                 </Button>
               </div>
             </div>
@@ -88,7 +88,7 @@ export default function Page() {
       ) : (
         <div className="mt-20 flex flex-col items-center gap-2">
           <Ghost className="size-8 text-zinc-800" />
-          <h3 className="text-xl font-semibold">暂无清单</h3>
+          <h3 className="text-xl font-semibold">你还没有清单，快去添加吧</h3>
         </div>
       )}
     </div>

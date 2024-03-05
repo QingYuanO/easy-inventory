@@ -15,11 +15,11 @@ import { cn } from "@/lib/utils";
 
 export default function Page() {
   const { data, isLoading } = api.shop.getShopsByUser.useQuery();
-  console.log(data);
 
   return (
     <div className="py-14">
-      <Header title="用户列表" isBack />
+      <Header title="店铺列表" isBack />
+
       {isLoading ? (
         <div>
           <div className="mt-20 flex items-center justify-center">
@@ -40,7 +40,12 @@ export default function Page() {
                   )}
                 >
                   <CardHeader className="p-4 pb-2">
-                    <CardTitle>{shop.name}</CardTitle>
+                    <CardTitle className="flex justify-between">
+                      <span>{shop.name}</span>
+                      {!shop.isActivity && (
+                        <span className="text-red-400">已锁定</span>
+                      )}
+                    </CardTitle>
                     <CardDescription className="w-full">
                       {shop.description ?? "暂无描述"}
                     </CardDescription>
@@ -62,8 +67,8 @@ export default function Page() {
           ) : (
             <div className="mt-20 flex flex-col items-center gap-2">
               <Ghost className="size-8 text-zinc-800" />
-              <h3 className="text-xl font-semibold">你还没有客户</h3>
-              <p className="">快点邀请吧</p>
+              <h3 className="text-xl font-semibold">你还没有绑定商家</h3>
+              <p className="">快点联系商家绑定吧</p>
             </div>
           )}
         </>

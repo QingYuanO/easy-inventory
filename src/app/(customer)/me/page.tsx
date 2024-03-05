@@ -23,7 +23,7 @@ export default async function Page() {
 
       <div className="mt-4 flex flex-col gap-4 p-4">
         <Link
-          href="/shop-list"
+          href="/my-inventory"
           className="flex items-center justify-between rounded border border-border p-4"
         >
           <div>我的清单</div>

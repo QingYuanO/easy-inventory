@@ -1,28 +1,47 @@
 "use client";
 import Header from "@/components/Header";
-import { buttonVariants } from "@/components/ui/button";
+import { Button } from "@/components/ui/button";
+import { inventoryGoodsAtom } from "@/lib/atom/inventory";
+import { SelectGoodsType } from "@/lib/schema/GoodsSchema";
+import { cn } from "@/lib/utils";
 import { api } from "@/trpc/react";
-import { Ghost, Loader2 } from "lucide-react";
-import Link from "next/link";
-import React from "react";
+import { useAtom } from "jotai";
+import { Ghost, Loader2, PlusSquare, XSquare } from "lucide-react";
+import React, { useState } from "react";
 import InfiniteScroll from "react-infinite-scroll-component";
+import AddedGoodsBar from "./_components/AddedGoodsBar";
+import { Input } from "@/components/ui/input";
 export default function Page() {
+  const nameRef = React.useRef<HTMLInputElement>(null);
+
+  const [name, setName] = useState<string>();
+
   const { data, isLoading, fetchNextPage, hasNextPage } =
     api.goods.getGoodsByShopOfSelected.useInfiniteQuery(
       {
         limit: 10,
+        name,
       },
       {
         getNextPageParam: (lastPage) => lastPage.nextCursor,
-        // initialCursor: 1,
       },
     );
-  const { data: shopList } = api.shop.getShopsByUser.useQuery();
-  const selectedShop = shopList?.find((shop) => shop.isSelected);
+  const { data: selectedShop } = api.shop.getShopByUserSelected.useQuery();
+
+  function onSearch() {
+    if (nameRef.current) {
+      setName(nameRef.current.value);
+    }
+  }
+
   const list = data?.pages.flatMap((page) => page.list);
   return (
-    <div className="py-14">
+    <div className="pb-28 pt-14">
       <Header title={`${selectedShop?.name ?? "xxx"}的商品`} />
+      <div className="mt-4 flex gap-4 px-4">
+        <Input ref={nameRef} placeholder="请输入商品名" />
+        <Button onClick={onSearch}>搜索</Button>
+      </div>
       {isLoading ? (
         <div className="mt-20 flex items-center justify-center">
           <Loader2 className="size-6 animate-spin" />
@@ -46,27 +65,54 @@ export default function Page() {
             </div>
           }
         >
-          {list?.map((goods) => (
-            <div
-              key={goods.id}
-              className="flex flex-col gap-2 rounded-lg border border-border bg-card p-4 shadow"
-            >
-              <div className="flex flex-col gap-1">
-                <p className="text font-bold">{goods.name}</p>
-                <p className="text-sm text-muted-foreground">
-                  {goods.description}
-                </p>
-              </div>
-              <div className="flex justify-end gap-2"></div>
-            </div>
-          ))}
+          {list?.map((goods) => <GoodsCard key={goods.id} goods={goods} />)}
         </InfiniteScroll>
       ) : (
         <div className="mt-20 flex flex-col items-center gap-2">
           <Ghost className="size-8 text-zinc-800" />
-          <h3 className="text-xl font-semibold">当前店铺还没有商品</h3>
+          <h3 className="text-xl font-semibold">没有查询到商品</h3>
         </div>
       )}
+      <AddedGoodsBar />
     </div>
   );
 }
+
+const GoodsCard = ({ goods }: { goods: SelectGoodsType }) => {
+  const [addedGoods, setGoods] = useAtom(inventoryGoodsAtom);
+  const isSelected = addedGoods.find((item) => item.goods.id === goods.id);
+  function onSwitchSelectGoods(goods: SelectGoodsType) {
+    if (isSelected) {
+      setGoods(addedGoods.filter((item) => item.goods.id !== goods.id));
+    } else {
+      setGoods((prev) => [...prev, { goods, num: 1, memo: "" }]);
+    }
+  }
+
+  return (
+    <div
+      key={goods.id}
+      className={cn(
+        "flex flex-col gap-2 rounded-lg border border-border bg-card p-4 shadow",
+        isSelected && "outline outline-foreground",
+      )}
+    >
+      <div className="flex flex-col gap-1">
+        <p className="text font-bold">{goods.name}</p>
+        <p className="text-sm text-muted-foreground">{goods.description}</p>
+      </div>
+      <div className="flex items-center justify-between gap-2">
+        <div>
+          {isSelected && <div className="text-sm text-foreground">已添加</div>}
+        </div>
+        <div onClick={() => onSwitchSelectGoods(goods)}>
+          {isSelected ? (
+            <XSquare className="cursor-pointer text-red-300" />
+          ) : (
+            <PlusSquare className="cursor-pointer" />
+          )}
+        </div>
+      </div>
+    </div>
+  );
+};

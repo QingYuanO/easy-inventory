@@ -13,6 +13,7 @@ export const shopRouter = createTRPCRouter({
         phone: shops.phone,
         id: shops.id,
         isSelected: usersToShops.isSelected,
+        isActivity: usersToShops.isActivity,
         description: shops.description,
       })
       .from(usersToShops)
@@ -21,7 +22,24 @@ export const shopRouter = createTRPCRouter({
       .where(eq(users.id, user.id));
     return shopList;
   }),
+  getShopByUserSelected: protectedProcedure.query(async ({ ctx }) => {
+    const { session, db } = ctx;
+    const { user } = session;
+    const userToShop = await db.query.usersToShops.findFirst({
+      where: and(
+        eq(usersToShops.userId, user.id),
+        eq(usersToShops.isSelected, true),
+      ),
+    });
 
+    if (!userToShop) {
+      return null;
+    }
+    const selectedShop = await db.query.shops.findFirst({
+      where: eq(shops.id, userToShop?.shopId),
+    });
+    return selectedShop;
+  }),
   switchUserSelectedShop: protectedProcedure
     .input(z.object({ shopId: z.string() }))
     .mutation(async ({ ctx, input }) => {
