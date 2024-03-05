@@ -35,26 +35,43 @@ export default function Page() {
           </Button>
         </div>
       ) : (
-        <div className="flex flex-col gap-4 p-4">
+        <div className="flex flex-col gap-4 p-4 print:text-sm">
+          <div className="flex flex-col gap-2">
+            <div className="text-lg">用户信息</div>
+            <div className="grid grid-cols-2 gap-2 divide-y rounded-lg border border-border bg-card py-2 shadow  print:gap-1 print:rounded print:py-2 print:shadow-none">
+              <div className="col-span-2 flex items-center justify-between gap-1 px-4 pt-2 first:pt-0 print:px-2 print:pt-1">
+                <p className="text font-bold">姓名</p>
+                <p className="text-sm text-muted-foreground">
+                  {data.user.name}
+                </p>
+              </div>
+              <div className="col-span-2 flex  items-center justify-between gap-1 px-4 pt-2 first:pt-0 print:px-2 print:pt-1">
+                <p className="text font-bold">电话</p>
+                <p className="text-sm text-muted-foreground">
+                  {data.user.phone}
+                </p>
+              </div>
+            </div>
+          </div>
           <div className="flex flex-col gap-2">
             <div className="text-lg">商品</div>
-            <div className="grid grid-cols-2 gap-4 ">
+            <div className="grid grid-cols-2 gap-2 divide-y rounded-lg border border-border bg-card py-2 shadow  print:gap-1 print:rounded print:py-2 print:shadow-none">
               {data?.goodsToInventories.map((item) => (
                 <div
                   key={item.goods.id}
-                  className="col-span-2 flex flex-col gap-2 rounded-lg border border-border bg-card p-4 shadow print:col-span-1 print:shadow-none"
+                  className="col-span-2 flex flex-col gap-2 px-4 pt-2 first:pt-0 print:px-2 print:pt-1"
                 >
                   <div className="flex items-center justify-between gap-1">
                     <p className="text font-bold">{item.goods.name}</p>
                     <p className="text-sm text-muted-foreground">
-                      {item.num}件
+                      x{item.num}件
                     </p>
                   </div>
-                  <div className="">
+                  {item.memo && (
                     <div className="text-sm text-foreground">
                       备注：{item.memo ? item.memo : "-"}
                     </div>
-                  </div>
+                  )}
                 </div>
               ))}
             </div>
@@ -62,7 +79,7 @@ export default function Page() {
           {data.memo && (
             <div className="flex flex-col gap-2">
               <div className="text-lg">备注</div>
-              <div className="col-span-2 flex flex-col gap-2 rounded-lg border border-border bg-card p-4 shadow print:shadow-none">
+              <div className="col-span-2 flex flex-col gap-2 rounded-lg border border-border bg-card p-4 shadow print:gap-1 print:rounded  print:p-2 print:shadow-none">
                 {data.memo}
               </div>
             </div>

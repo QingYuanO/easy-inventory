@@ -158,6 +158,7 @@ export const inventoryRouter = createTRPCRouter({
         ),
         with: {
           shop: true,
+          user: true,
           goodsToInventories: {
             with: {
               goods: true,
