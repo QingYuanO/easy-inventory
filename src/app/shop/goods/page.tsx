@@ -89,7 +89,7 @@ export default function Page() {
       ) : (
         <div className="mt-20 flex flex-col items-center gap-2">
           <Ghost className="size-8 text-zinc-800" />
-          <h3 className="text-xl font-semibold">你还没有商品</h3>
+          <h3 className="font-semibold">你还没有商品</h3>
           <Link
             href="/shop/goods/edit?type=create"
             className={buttonVariants({ variant: "secondary" })}

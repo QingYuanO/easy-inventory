@@ -118,7 +118,6 @@ export const inventoryEnum = pgEnum("status", [
   "WAIT",
 ]);
 
-
 export const inventories = createTable("inventories", {
   id: varchar("id", { length: 255 })
     .notNull()
@@ -149,16 +148,22 @@ export const inventoriesRelations = relations(inventories, ({ one, many }) => ({
   goodsToInventories: many(goodsToInventories),
 }));
 
-export const goodsToInventories = createTable("goods_to_inventories", {
-  goodsId: varchar("goods_id", { length: 255 })
-    .notNull()
-    .references(() => goods.id),
-  inventoryId: varchar("inventory_id", { length: 255 })
-    .notNull()
-    .references(() => inventories.id),
-  num: integer("num").notNull(),
-  memo: text("memo"),
-});
+export const goodsToInventories = createTable(
+  "goods_to_inventories",
+  {
+    goodsId: varchar("goods_id", { length: 255 })
+      .notNull()
+      .references(() => goods.id),
+    inventoryId: varchar("inventory_id", { length: 255 })
+      .notNull()
+      .references(() => inventories.id),
+    num: integer("num").notNull(),
+    memo: text("memo"),
+  },
+  (t) => ({
+    pk: primaryKey({ columns: [t.goodsId, t.inventoryId] }),
+  }),
+);
 
 export const goodsToInventoriesRelations = relations(
   goodsToInventories,

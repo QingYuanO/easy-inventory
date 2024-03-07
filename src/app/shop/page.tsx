@@ -88,7 +88,7 @@ export default function Page() {
       ) : (
         <div className="mt-20 flex flex-col items-center gap-2">
           <Ghost className="size-8 text-zinc-800" />
-          <h3 className="text-xl font-semibold">暂无清单</h3>
+          <h3 className="font-semibold">暂无清单</h3>
         </div>
       )}
     </div>

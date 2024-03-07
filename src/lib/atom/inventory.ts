@@ -12,4 +12,10 @@ export const inventoryGoodsAtom = atomWithStorage<InventoryGoods[]>(
   [],
 );
 
-export const inventoryGoodsAtomsAtom = splitAtom(inventoryGoodsAtom);
+export const inventoryMemoAtom = atom<string>("");
+export const inventoryNameAtom = atom<string>("");
+
+export const updateInventoryGoodsAtom = atom<InventoryGoods[]>([]);
+export const updateInventoryGoodsAtomsAtom = splitAtom(
+  updateInventoryGoodsAtom,
+);

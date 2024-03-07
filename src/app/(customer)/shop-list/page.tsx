@@ -67,7 +67,7 @@ export default function Page() {
           ) : (
             <div className="mt-20 flex flex-col items-center gap-2">
               <Ghost className="size-8 text-zinc-800" />
-              <h3 className="text-xl font-semibold">你还没有绑定商家</h3>
+              <h3 className="font-semibold">你还没有绑定商家</h3>
               <p className="">快点联系商家绑定吧</p>
             </div>
           )}

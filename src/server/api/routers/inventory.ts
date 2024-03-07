@@ -74,15 +74,89 @@ export const inventoryRouter = createTRPCRouter({
             message: "创建清单失败",
           });
         }
-        for (const item of input.goods) {
-          await tx.insert(goodsToInventories).values({
+        await tx.insert(goodsToInventories).values(
+          input.goods.map((item) => ({
             inventoryId: insertInventory.id,
             goodsId: item.goodsId,
             num: item.num,
             memo: item.memo,
+          })),
+        );
+      });
+    }),
+
+  updateInventory: protectedProcedure
+    .input(
+      z.object({
+        id: z.string(),
+        memo: z.string().optional(),
+        name: z.string().optional(),
+        goods: z.array(
+          z.object({
+            goodsId: z.string(),
+            num: z.number(),
+            memo: z.string().optional(),
+          }),
+        ),
+      }),
+    )
+    .mutation(async ({ ctx, input }) => {
+      const { session, db } = ctx;
+      const inventory = await db.query.inventories.findFirst({
+        where: eq(inventories.id, input.id),
+      });
+      if (!inventory) {
+        throw new TRPCError({
+          code: "NOT_FOUND",
+          message: "清单不存在",
+        });
+      }
+
+      if (inventory.status !== "WAIT") {
+        throw new TRPCError({
+          code: "BAD_REQUEST",
+          message: "清单已确认，无法修改",
+        });
+      }
+
+      await db.transaction(async (tx) => {
+        const data = await tx
+          .update(inventories)
+          .set({
+            name: input.name ?? "清单",
+            memo: input.memo,
+          })
+          .where(eq(inventories.id, input.id))
+          .returning();
+        const insertInventory = data[0];
+        if (!insertInventory) {
+          throw new TRPCError({
+            code: "INTERNAL_SERVER_ERROR",
+            message: "修改清单失败",
           });
         }
+        for (const item of input.goods) {
+          await tx
+            .insert(goodsToInventories)
+            .values({
+              inventoryId: insertInventory.id,
+              goodsId: item.goodsId,
+              num: item.num,
+              memo: item.memo,
+            })
+            .onConflictDoUpdate({
+              target: [
+                goodsToInventories.inventoryId,
+                goodsToInventories.goodsId,
+              ],
+              set: {
+                num: item.num,
+                memo: item.memo,
+              },
+            });
+        }
       });
+      return { success: true };
     }),
   getInventories: protectedProcedure
     .input(

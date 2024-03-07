@@ -1,8 +1,14 @@
 "use client";
 import Header from "@/components/Header";
 import { Button } from "@/components/ui/button";
+import {
+  inventoryMemoAtom,
+  inventoryNameAtom,
+  updateInventoryGoodsAtom,
+} from "@/lib/atom/inventory";
 import { getInventoryStatusColor, getInventoryStatusText } from "@/lib/utils";
 import { api } from "@/trpc/react";
+import { useAtom, useSetAtom } from "jotai";
 import { Ghost, Loader2 } from "lucide-react";
 import Link from "next/link";
 import React from "react";
@@ -19,6 +25,9 @@ export default function Page() {
       },
     );
   const list = data?.pages.flatMap((page) => page.list);
+  const setInventoryName = useSetAtom(inventoryNameAtom);
+  const setInventoryMemo = useSetAtom(inventoryMemoAtom);
+  const setUpdateGoodsValue = useSetAtom(updateInventoryGoodsAtom);
   return (
     <div className="pb-28 pt-14">
       <Header title="我的清单" isBack />
@@ -79,7 +88,21 @@ export default function Page() {
                   <a href={`tel:${item.shop.phone}`}>拨打电话</a>
                 </Button>
                 <Button variant={"default"} size="sm" asChild>
-                  <Link href={`/my-inventory/${item.id}`}>详情</Link>
+                  <Link
+                    onClick={() => {
+                      setInventoryMemo(item.memo ?? "");
+                      setInventoryName(item.name);
+                      setUpdateGoodsValue(
+                        item.goodsToInventories.map((item) => ({
+                          ...item,
+                          memo: item.memo ?? "",
+                        })),
+                      );
+                    }}
+                    href={`/inventories/edit?id=${item.id}&type=${item.status === "WAIT" ? "update" : "view"}`}
+                  >
+                    {item.status === "WAIT" ? "编辑" : "详情"}
+                  </Link>
                 </Button>
               </div>
             </div>
@@ -88,7 +111,7 @@ export default function Page() {
       ) : (
         <div className="mt-20 flex flex-col items-center gap-2">
           <Ghost className="size-8 text-zinc-800" />
-          <h3 className="text-xl font-semibold">你还没有清单，快去添加吧</h3>
+          <h3 className="font-semibold">你还没有清单，快去添加吧</h3>
         </div>
       )}
     </div>
